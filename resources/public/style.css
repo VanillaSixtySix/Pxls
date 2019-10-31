@@ -26,6 +26,21 @@ z-index:
 | General Styles
 \*\\\\\\\\\\\\\\\\\\\\\\\\\\*/
 
+/* SPOOKY */
+
+@font-face {
+    font-family: Hellvetica;
+    src: url(Hellvetica.ttf);
+}
+
+/* Because people still need to be able to see the rules */
+
+article[id="canvas-rules"], article[id="chat-rules"] {
+    font-family: sans-serif;
+}
+
+/* SPOOKY */
+
 html, body {
     margin: 0;
     width: 100%;
@@ -33,7 +48,7 @@ html, body {
     background-color: #CDCDCD;
     overflow: hidden;
     position: relative;
-    font-family: sans-serif;
+    font-family: Hellvetica, sans-serif;
     -webkit-text-size-adjust: 100%;
     -moz-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
@@ -60,7 +75,7 @@ kbd {
     border-radius: 4px;
     color: black;
     display: inline-block;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Hellvetica, Arial, Helvetica, sans-serif;
     font-size: 11px;
     line-height: 1.5;
     margin: 0 .1em .1em .1em;
@@ -1124,7 +1139,7 @@ body.panel-left.panel-right.panel-right-halfwidth .ui-bar {
     padding: 0;
     list-style: none;
     height: calc(100% - 3rem);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Hellvetica, Arial, Helvetica, sans-serif;
 }
 
 ul.chat-body li.chat-line {
@@ -1225,7 +1240,7 @@ li.chat-line .actions [data-action]:not(:last-of-type):not(:only-child) {
 }
 
 .chat-wrapper .chat-hints {
-    font-family: monospace;
+    font-family: Hellvetica, monospace;
     font-size: 1.3rem;
     font-weight: bold;
     position: absolute;
@@ -1241,7 +1256,7 @@ li.chat-line .actions [data-action]:not(:last-of-type):not(:only-child) {
     margin: 0;
     padding: 5px;
     resize: none;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Hellvetica, Arial, Helvetica, sans-serif;
 }
 
 .panel-trigger .has-notification {
