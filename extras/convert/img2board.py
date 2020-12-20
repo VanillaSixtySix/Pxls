@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 
 argparser = ArgumentParser(description='Converts the given board (and placemap, if applicable) to default_board.dat and placemap.dat.')
-argparser.add_argument('board', help='board image path', default='default_board.png')
+argparser.add_argument('board', help='board image path', default='canvas.png')
 argparser.add_argument('placemap', nargs='?', help='placemap image path', default='placemap.png')
 # Default assumes user copied extras/ to <instance>/.
 argparser.add_argument('--palette', '-p', help='palette.conf directory or path', default='../../palette.conf')
