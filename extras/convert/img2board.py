@@ -2,7 +2,6 @@
 from argparse import ArgumentParser
 from pyhocon import ConfigFactory
 from PIL import Image, ImageColor
-from PIL.ImagePalette import ImagePalette
 from pathlib import Path
 import sys
 
