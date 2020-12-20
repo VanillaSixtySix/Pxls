@@ -1,110 +1,87 @@
-#!/usr/bin/python3
-from PIL import Image
-import json
-import os
-import re
+#!/usr/bin/env python3
+from argparse import ArgumentParser
+from pyhocon import ConfigFactory
+from PIL import Image, ImageColor
+from PIL.ImagePalette import ImagePalette
+from pathlib import Path
 import sys
 
-# Getting palette
+argparser = ArgumentParser(description='Converts the given board (and placemap, if applicable) to default_board.dat and placemap.dat.')
+argparser.add_argument('board', help='board image path', default='default_board.png')
+argparser.add_argument('placemap', nargs='?', help='placemap image path', default='placemap.png')
+# Default assumes user copied extras/ to <instance>/.
+argparser.add_argument('--palette', '-p', help='palette.conf directory or path', default='../../palette.conf')
+argparser.add_argument('--output', '-o', help='output directory path', default='./')
+argparser.add_argument('--dither', '-d', help='whether to dither the palette conversion', action='store_true')
+args = argparser.parse_args()
 
-# /absolute/path/to/Pxls
-convertpath = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../..'))
-# /absolute/path/to/Pxls/pxls.conf
-configpath = convertpath + '\\pxls.conf'
+# Assign all of the absolute resolved paths.
+board_path = Path(args.board).absolute().resolve()
+placemap_path = Path(args.placemap).absolute().resolve()
+palette_path = Path(args.palette).absolute().resolve()
+output_path = Path(args.output).absolute().resolve()
+output_board_path = output_path.joinpath('default_board.dat')
+output_placemap_path = output_path.joinpath('placemap.dat')
+dither = 1 if args.dither else 0
 
-try:
-	lines = None
-	with open(configpath, 'r+') as configfile:
-		config = str(configfile.read())
-		lines = [line.strip() for line in config.splitlines()]
+# Allows for using a directory as the palette path (e.g. `.`).
+if palette_path.is_dir():
+    palette_path = palette_path.joinpath('palette.conf')
 
-	for line in lines:
-		paletteMatch = re.search('^palette: (\[.+\])', line)
-		if paletteMatch is not None:
-			paletteRaw = paletteMatch.group(1)
-			break
-except FileNotFoundError:
-	print('Cannot find pxls.conf in previous directory')
-	paletteRaw = input('Input palette array manually in the format \'["#000000", "#FF0000", ...]\': ')
+# Manual input isn't feasible through arguments.
+if not palette_path.exists():
+    print('Could not find palette configuration at the given path.')
+    sys.exit(1)
 
-paletteArr = json.loads(paletteRaw)
+# Parse the palette configuration and extract hex colors.
+palette_conf = ConfigFactory().parse_file(str(palette_path))
+colors = palette_conf['colors']
+hex_colors = [color.value for color in colors]
 
-hexToRGB = lambda hex : tuple(int(hex.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
-palette = [hexToRGB(hex) for hex in paletteArr]
+# Convert all hex colors to RGB tuples.
+rgb_colors = [ImageColor.getrgb('#' + hex_color) for hex_color in hex_colors]
 
-# Getting paths
+# Open the board image.
+board_img = Image.open(str(board_path))
+board_pix = board_img.load()
+width, height = board_img.size
 
-imagePath = sys.argv[1]
-placemapPath = sys.argv[2] if len(sys.argv) > 2 else None
+# If a placemap wasn't provided, generate one with the board size.
+if placemap_path.exists():
+    placemap_image = Image.open(str(placemap_path))
+    if placemap_image.mode != 'RGBA':
+        placemap_image.putalpha(255)
+else:
+    print('Could not find placemap at the given path; using generated.')
+    placemap_image = Image.new('RGBA', board_img.size, color=(0, 0, 0, 255))
+placemap_pix = placemap_image.load()
 
-outputPath = 'default_board.dat'
-pmoutputPath = 'placemap.dat'
+# Create a sample Image based on the palette.
+palette_img = Image.new('P', (len(rgb_colors), 1))
+for idx, rgb in enumerate(rgb_colors):
+    palette_img.putpixel((idx, 0), rgb)
 
-img = Image.open(imagePath)
-if img.mode != 'RGBA':
-	img = img.convert('RGBA')
-pix = img.load()
+# Quantize colors in the board image to the palette.
+qt_board_img = board_img.convert('RGB').quantize(palette=palette_img, dither=dither)
+qt_board_pix = qt_board_img.load()
 
-if placemapPath:
-	pmimg = Image.open(placemapPath)
-	if pmimg.mode != 'RGBA':
-		pmimg = pmimg.convert('RGBA')
-	pmpix = pmimg.load()
+# Save the quantized board image to default_board.dat.
+with open(str(output_board_path), 'wb+') as file:
+    file.truncate()
+    for y in range(height):
+        for x in range(width):
+            pix = board_pix[x, y]
+            idx = qt_board_pix[x, y]
+            # If the pixel isn't completely opaque, assume it's transparent.
+            if board_img.mode == 'RGBA' and pix[3] != 255:
+                file.write(bytes([255]))
+                continue
+            file.write(bytes([idx]))
 
-width = img.size[0]
-height = img.size[1]
-
-if placemapPath:
-	if pmimg.size[0] != width or pmimg.size[1] != height:
-		print(f"{placemapPath} dimensions ({pmimg.size[0]}x{pmimg.size[1]}) don't match {imagePath} dimensions ({width}x{height})")
-		sys.exit(1)
-
-print(f'Board is {width}x{height}')
-
-# Convertion
-
-def color_to_palette(c):
-	for i in range(len(palette)):
-		if c == palette[i]:
-			return i
-	diff = []
-	for i in range(len(palette)):
-		diff.append(sum([abs(palette[i][j] - c[j]) for j in range(3)]))
-	min = 0
-	for i in range(len(diff)):
-		if diff[i] < diff[min]:
-			min = i
-	return min
-
-print('Converting...')
-
-i = 0
-with open(outputPath, 'wb+') as f:
-	f.truncate()
-	bs = []
-	for y in range(height):
-		for x in range(width):
-			p = pix[x, y] # (r, g, b, a)
-			b = 0xFF
-			if p[3] == 255:
-				c = (p[0], p[1], p[2])
-				b = color_to_palette(c)
-				i += 1
-			bs.append(b)
-	f.write(bytes(bs))
-print(f"* Written {outputPath} ({i}/{width * height} non-transparent pixels)")
-
-i = 0
-with open(pmoutputPath, 'wb+') as f:
-	f.truncate()
-	bs = []
-	for y in range(height):
-		for x in range(width):
-			b = 0xFF
-			p = pmpix[x, y] if placemapPath else pix[x, y] # (r, g, b, a)
-			if p[3] == 255:
-				b = 0x00
-				i += 1
-			bs.append(b)
-	f.write(bytes(bs))
-print(f"* Written {pmoutputPath} ({i}/{width * height} placeable pixels)")
+# Save the placemap to placemap.dat.
+with open(str(output_placemap_path), 'wb+') as file:
+    file.truncate()
+    for y in range(height):
+        for x in range(width):
+            pix = placemap_pix[x, y]
+            file.write(bytes([255 if pix[3] == 255 else 0]))
