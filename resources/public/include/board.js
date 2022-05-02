@@ -386,7 +386,10 @@ const board = (function() {
           if (settings.place.picker.enable.get() === true && event.button === 1 && dx < 15 && dy < 15) {
             // If so, switch to the color at the location.
             const { x, y } = self.fromScreen(event.clientX, event.clientY);
-            place.switch(self.getPixelIndex(x, y));
+            const color = self.getPixelIndex(x, y);
+            // One more thing... is the color usable?
+            if (!place.palette[color].usable) return;
+            place.switch(color);
           }
         }
       }
