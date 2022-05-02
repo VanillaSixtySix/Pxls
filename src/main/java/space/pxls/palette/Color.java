@@ -4,9 +4,12 @@ public class Color {
 	private String name;
 	private String value;
 
-	public Color(String name, String value) {
+	private boolean usable;
+
+	public Color(String name, String value, boolean usable) {
 		this.name = name;
 		this.value = normalizeHex(value);
+		this.usable = usable;
 	}
 
 	public String getValue() {
@@ -15,6 +18,10 @@ public class Color {
 
 	public String getName() {
 		return name;
+	}
+
+	public boolean getUsable() {
+		return usable;
 	}
 
 	public static String normalizeHex(String hex) {

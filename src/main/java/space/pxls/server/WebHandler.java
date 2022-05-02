@@ -15,6 +15,7 @@ import io.undertow.util.*;
 import space.pxls.App;
 import space.pxls.auth.*;
 import space.pxls.data.*;
+import space.pxls.palette.Color;
 import space.pxls.server.packets.http.Error;
 import space.pxls.server.packets.http.*;
 import space.pxls.server.packets.socket.*;
@@ -171,7 +172,7 @@ public class WebHandler {
                     m.put("requested_self", requested_self);
                     m.put("profile_of", profileUser);
                     m.put("factions", factions);
-                    m.put("palette", App.getPalette().getColors().stream().map(color -> color.getValue()).collect(Collectors.toList()));
+                    m.put("palette", App.getPalette().getColors().stream().filter(color -> color.getUsable()).map(color -> color.getValue()).collect(Collectors.toList()));
                     m.put("route_root", requested_self ? "/profile" : String.format("/profile/%s", requested));
                     m.put("keys", keys);
 
@@ -1118,7 +1119,7 @@ public class WebHandler {
 
         try {
             int t = Integer.parseInt(nameColor.getValue());
-            if (t >= -13 && t < App.getPalette().getColors().size()) {
+            if (t >= -13 && t < App.getPalette().getColors().stream().filter(Color::getUsable).toList().size()) {
                 var hasAllDonatorColors = user.hasPermission("chat.usercolor.donator") || user.hasPermission("chat.usercolor.donator.*");
                 if (t == -1 && !user.hasPermission("chat.usercolor.rainbow")) {
                     sendBadRequest(exchange, "Color reserved for staff members");
