@@ -1093,7 +1093,7 @@ const chat = (function() {
           value: i,
           'data-idx': i,
           style: `background-color: #${hex}`
-        }, `${i}. ${name}`))
+        }, `${i}. ${name}`)).filter(p => place.palette[parseInt(p.getAttribute('data-idx'))].usable)
       );
       self.elements.username_color_select[0].value = user.getChatNameColor();
     },
