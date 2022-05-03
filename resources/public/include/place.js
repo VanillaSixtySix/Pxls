@@ -36,7 +36,7 @@ module.exports.place = (function() {
       self.autoreset = !!v;
     },
     switch: function(newColorIdx) {
-      const isOnPalette = newColorIdx >= 0 && newColorIdx < self.palette.length && (self.palette[newColorIdx].usable && user.placementOverrides && !user.placementOverrides.canPlaceAnyColor);
+      const isOnPalette = newColorIdx >= 0 && newColorIdx < self.palette.length && (self.palette[newColorIdx].usable || (user.placementOverrides && user.placementOverrides.canPlaceAnyColor));
       const isTransparent = newColorIdx === 0xFF && user.placementOverrides && user.placementOverrides.canPlaceAnyColor;
 
       if (!isOnPalette && !isTransparent) {
