@@ -291,6 +291,20 @@ const board = (function() {
               place.switch(index);
               break;
             }
+            case 'copytemplate': {
+              const coordinates = board.fromScreen(evt.clientX, evt.clientY, true);
+              const x = coordinates.x - template.getOptions().x;
+              const y = coordinates.y - template.getOptions().y;
+              // If the coordinates are outside the template, just copy color
+              if (x < 0 || y < 0 || x >= template.getDisplayWidth() || y >= template.getDisplayHeight()) {
+                const index = board.getPixelIndex(coordinates.x, coordinates.y);
+                place.switch(index);
+                break;
+              }
+              const index = template.getPixelIndex(x, y);
+              place.switch(index);
+              break;
+            }
             case 'lookup':
               lookup.runLookup(evt.clientX, evt.clientY);
               break;
@@ -843,7 +857,8 @@ const board = (function() {
     },
     get snipMode() {
       return self.webInfo && self.webInfo.snipMode === true;
-    }
+    },
+    rgbPalette: self.rgbPalette
   };
 })();
 

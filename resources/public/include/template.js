@@ -2,6 +2,7 @@ const { settings } = require('./settings');
 let board;
 let query;
 let uiHelper;
+let place;
 
 // here all the template stuff happens
 module.exports.template = (function() {
@@ -49,7 +50,8 @@ module.exports.template = (function() {
           nearestCustom: null
         },
         stylize: null
-      }
+      },
+      pixels: null
     },
     corsProxy: {
       base: undefined,
@@ -328,6 +330,7 @@ module.exports.template = (function() {
       board = require('./board').board;
       query = require('./query').query;
       uiHelper = require('./uiHelper').uiHelper;
+      place = require('./place').place;
       self.elements.visibles = $().add(self.elements.template).add(self.elements.sourceImage).addClass('noselect board-template');
 
       self.elements.imageErrorWarning.hide();
@@ -746,6 +749,7 @@ module.exports.template = (function() {
       self.gl.context.enableVertexAttribArray(stylePosLocation);
       self.gl.context.uniform1i(self.gl.context.getUniformLocation(self.gl.programs.stylize, 'u_Template'), 0);
       self.gl.context.uniform1i(self.gl.context.getUniformLocation(self.gl.programs.stylize, 'u_Style'), 1);
+      self.gl.pixels = new Uint8Array(self.gl.context.drawingBufferWidth * self.gl.context.drawingBufferHeight * 4);
     },
     createGlProgram: function(vertexSource, fragmentSource) {
       const program = self.gl.context.createProgram();
@@ -863,6 +867,73 @@ module.exports.template = (function() {
       self.gl.context.bindTexture(self.gl.context.TEXTURE_2D, self.gl.textures.style);
 
       self.gl.context.drawArrays(self.gl.context.TRIANGLE_STRIP, 0, 4);
+      self.gl.context.readPixels(0, 0, width, height, self.gl.context.RGBA, self.gl.context.UNSIGNED_BYTE, self.gl.pixels);
+
+      // Invert self.gl.pixels vertically so (0, 0) is top-left
+      // This should not use additional memory
+      for (let y = 0; y < height / 2; y++) {
+        const offset1 = y * width * 4;
+        const offset2 = (height - y - 1) * width * 4;
+
+        for (let x = 0; x < width * 4; x++) {
+          const temp = self.gl.pixels[offset1 + x];
+          self.gl.pixels[offset1 + x] = self.gl.pixels[offset2 + x];
+          self.gl.pixels[offset2 + x] = temp;
+        }
+      }
+    },
+    getPixelIndex: function(x, y) {
+      console.time('getPixelIndex');
+      x = Math.floor(x);
+      y = Math.floor(y);
+
+      let width = self.getInternalWidth();
+      let height = self.getInternalHeight();
+      let styleWidth = self.getStyleWidth();
+
+      if (self.elements.styleImage.prop('src') === self.options.style) {
+        width = self.elements.sourceImage.get(0).naturalWidth;
+        height = self.elements.sourceImage.get(0).naturalHeight;
+        styleWidth = self.elements.sourceImage.get(0).naturalWidth / self.elements.widthInput.val();
+      }
+
+      const index = (x + width * y) * styleWidth * 4;
+
+      let r;
+      let g;
+      let b;
+
+      if (self.elements.styleImage.prop('src') !== self.options.style) {
+        console.debug('Use WebGL (x: ' + x + ', y: ' + y + ', index: ' + index + ')');
+        r = self.gl.pixels[index];
+        g = self.gl.pixels[index + 1];
+        b = self.gl.pixels[index + 2];
+      } else {
+        // Track performance from start to end of this function
+        console.debug('Use canvas (x: ' + x + ', y: ' + y + ', index: ' + index + ')');
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = width;
+        tempCanvas.height = height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(self.elements.sourceImage.get(0), 0, 0);
+        const imageData = tempCtx.getImageData(x * styleWidth, y * styleWidth, styleWidth, styleWidth);
+        // NOTE: This will only work properly if the extracted square is a single color
+        for (let i = 0; i < imageData.data.length; i += 4) {
+          if (imageData.data[i] !== 0) {
+            console.debug('Found color at index ' + i + ' (' + imageData.data[i] + ', ' + imageData.data[i + 1] + ', ' + imageData.data[i + 2] + ', ' + imageData.data[i + 3] + ')');
+            r = imageData.data[i];
+            g = imageData.data[i + 1];
+            b = imageData.data[i + 2];
+            break;
+          }
+        }
+      }
+
+      // Hack go brrrrr (had to use Uint32Array because 255, 255, 255, 255 = -1 for some reason?)
+      const colorValue = new Uint32Array([((255 << 24) >>> 0) | (b << 16) | (g << 8) | r])[0];
+      const paletteIndex = place.getPaletteABGR().indexOf(colorValue);
+      console.timeEnd('getPixelIndex');
+      return paletteIndex !== -1 ? paletteIndex : 0xFF;
     }
   };
   return {
@@ -876,6 +947,7 @@ module.exports.template = (function() {
     setPixelated: self.setPixelated,
     getDisplayWidth: self.getDisplayWidth,
     getDisplayHeight: self.getDisplayHeight,
-    getWidthRatio: self.getWidthRatio
+    getWidthRatio: self.getWidthRatio,
+    getPixelIndex: self.getPixelIndex
   };
 })();

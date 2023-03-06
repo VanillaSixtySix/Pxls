@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Pxls\n"
-"POT-Creation-Date: 2023-03-03T22:26:34.830Z\n"
+"POT-Creation-Date: 2023-03-04T06:52:31.542Z\n"
 "Language: fr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 
@@ -935,6 +935,10 @@ msgstr "Retirer la couleur"
 #: resources/public/pebble_templates/index.html
 msgid "Copy color"
 msgstr "Copier la couleur"
+
+#: resources/public/pebble_templates/index.html
+msgid "Copy template color"
+msgstr "Copier la couleur du modèle"
 
 #: resources/public/pebble_templates/index.html
 msgid "Lookup"
