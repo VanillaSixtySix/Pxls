@@ -257,7 +257,11 @@ public class PacketHandler {
                             doCaptcha = (allTime ? user.getAllTimePixelCount() : user.getPixelCount()) < pixels;
                         }
                     }
-                    if (user.updateCaptchaFlagPrePlace() && doCaptcha) {
+                    if (!App.getConfig().getBoolean("captcha.sendAfterPlace") && user.isFlaggedForCaptcha() && doCaptcha) {
+                        App.getDebugLogger().info("User " + user.getName() + " is already flagged for captcha");
+                    }
+                    if (!App.getConfig().getBoolean("captcha.sendAfterPlace") && user.updateCaptchaFlagPrePlace() && doCaptcha) {
+                        App.getDebugLogger().info("Flagging " + user.getName() + " for captcha (before placement)");
                         server.send(channel, new ServerCaptchaRequired());
                     } else {
                         int c = App.getPixel(cp.getX(), cp.getY());
@@ -313,6 +317,13 @@ public class PacketHandler {
                                 broadcastPixelUpdate(cp.getX(), cp.getY(), cp.getColor());
                                 ackPlace(user, cp.getX(), cp.getY());
                                 sendPixelCountUpdate(user);
+                                if (App.getConfig().getBoolean("captcha.sendAfterPlace") && user.isFlaggedForCaptcha() && doCaptcha) {
+                                    App.getDebugLogger().info("User " + user.getName() + " is already flagged for captcha");
+                                }
+                                if (App.getConfig().getBoolean("captcha.sendAfterPlace") && user.updateCaptchaFlagPrePlace() && doCaptcha) {
+                                    App.getDebugLogger().info("Flagging " + user.getName() + " for captcha (after placement)");
+                                    server.send(channel, new ServerCaptchaRequired());
+                                }
                             }
                             if (!user.hasIgnoreCooldown()) {
                                 if (user.isIdled()) {
@@ -367,6 +378,10 @@ public class PacketHandler {
                         boolean success = body.getObject().getBoolean("success") && body.getObject().getString("hostname").equals(hostname);
                         if (success) {
                             user.validateCaptcha();
+                            App.getDebugLogger().info("Captcha validation succeeded for " + user.getName());
+                            user.setFlaggedForCaptcha(false);
+                        } else {
+                            App.getDebugLogger().info("Captcha validation failed for " + user.getName());
                         }
 
                         server.send(channel, new ServerCaptchaStatus(success));
@@ -374,7 +389,7 @@ public class PacketHandler {
 
                     @Override
                     public void failed(UnirestException e) {
-
+                        App.getDebugLogger().info("Captcha validation failed for " + user.getName() + " (request failed)");
                     }
 
                     @Override

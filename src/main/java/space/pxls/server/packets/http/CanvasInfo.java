@@ -14,6 +14,7 @@ public class CanvasInfo {
     public List<Color> palette;
     public CooldownInfo cooldownInfo;
     public String captchaKey;
+    public Boolean captchaSendAfterPlace;
     public Integer heatmapCooldown;
     public Integer maxStacked;
     public Map<String, AuthService> authServices;
@@ -30,13 +31,14 @@ public class CanvasInfo {
     public Integer chatLinkMinimumPixelCount;
     public Boolean chatLinkSendToStaff;
 
-    public CanvasInfo(String canvasCode, Integer width, Integer height, List<Color> palette, CooldownInfo cooldownInfo, String captchaKey, Integer heatmapCooldown, Integer maxStacked, Map<String, AuthService> authServices, Boolean registrationEnabled, Boolean chatEnabled, Integer chatCharacterLimit, boolean chatRespectsCanvasBan, List<String> chatBannerText, boolean snipMode, List<Object> customEmoji, String corsBase, String corsParam, String chatRatelimitMessage, Integer chatLinkMinimumPixelCount, boolean chatLinkSendToStaff) {
+    public CanvasInfo(String canvasCode, Integer width, Integer height, List<Color> palette, CooldownInfo cooldownInfo, String captchaKey, Boolean captchaSendAfterPlace, Integer heatmapCooldown, Integer maxStacked, Map<String, AuthService> authServices, Boolean registrationEnabled, Boolean chatEnabled, Integer chatCharacterLimit, boolean chatRespectsCanvasBan, List<String> chatBannerText, boolean snipMode, List<Object> customEmoji, String corsBase, String corsParam, String chatRatelimitMessage, Integer chatLinkMinimumPixelCount, boolean chatLinkSendToStaff) {
         this.canvasCode = canvasCode;
         this.width = width;
         this.height = height;
         this.palette = palette;
         this.cooldownInfo = cooldownInfo;
         this.captchaKey = captchaKey;
+        this.captchaSendAfterPlace = captchaSendAfterPlace;
         this.heatmapCooldown = heatmapCooldown;
         this.maxStacked = maxStacked;
         this.authServices = authServices;
@@ -72,6 +74,10 @@ public class CanvasInfo {
 
     public String getCaptchaKey() {
         return captchaKey;
+    }
+
+    public Boolean getCaptchaSendAfterPlace() {
+        return captchaSendAfterPlace;
     }
 
     public Integer getHeatmapCooldown() {

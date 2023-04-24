@@ -313,6 +313,10 @@ public class User {
         return flaggedForCaptcha;
     }
 
+    public void setFlaggedForCaptcha(boolean flaggedForCaptcha) {
+        this.flaggedForCaptcha = flaggedForCaptcha;
+    }
+
     public void flagForCaptcha() {
         flaggedForCaptcha = true;
     }

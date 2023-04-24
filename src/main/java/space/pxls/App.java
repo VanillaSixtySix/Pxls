@@ -37,6 +37,7 @@ public class App {
     private static Logger pixelLogger;
     private static Logger shadowbannedPixelLogger;
     private static Logger appLogger;
+    private static Logger debugLogger;
 
     private static String canvasCode;
 
@@ -74,6 +75,7 @@ public class App {
         pixelLogger = LogManager.getLogger("Pixels");
         shadowbannedPixelLogger = LogManager.getLogger("ShadowbannedPixels");
         appLogger = LogManager.getLogger("App");
+        debugLogger = LogManager.getLogger("Debug");
 
         canvasCode = config.getString("canvascode");
 
@@ -1344,6 +1346,10 @@ public class App {
 
     public static Logger getLogger() {
         return appLogger;
+    }
+
+    public static Logger getDebugLogger() {
+        return debugLogger;
     }
 
     public static UserManager getUserManager() {

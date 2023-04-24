@@ -1855,6 +1855,7 @@ public class WebHandler {
                     App.getConfig().getDuration("staticCooldown.time", TimeUnit.SECONDS),
                     App.getConfig().getObject("activityCooldown").unwrapped()),
             App.getConfig().getString("captcha.key"),
+            App.getConfig().getBoolean("captcha.sendAfterPlace"),
             (int) App.getConfig().getDuration("board.heatmapCooldown", TimeUnit.SECONDS),
             (int) App.getConfig().getInt("stacking.maxStacked"),
             services,

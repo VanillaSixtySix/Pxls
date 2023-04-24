@@ -156,6 +156,7 @@ window.App = (function() {
       getPermissions: user.getPermissions,
       hasPermission: user.hasPermission
     },
-    modal
+    modal,
+    _place: place._place
   };
 })();

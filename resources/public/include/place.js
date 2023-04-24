@@ -340,6 +340,7 @@ module.exports.place = (function() {
     init: self.init,
     update: self.update,
     place: self.place,
+    _place: self._place,
     switch: self.switch,
     setPalette: self.setPalette,
     get palette() {
