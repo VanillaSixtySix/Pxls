@@ -568,6 +568,12 @@ dt {
     z-index: 22;
 }
 
+#lookup-template {
+    position: fixed;
+    right: 16px;
+    z-index: 22;
+}
+
 /* moderator action popup styles */
 .chatmod-container th {
     text-align: right;
@@ -819,6 +825,39 @@ dt {
     text-align: center;
     white-space: nowrap;
     background: var(--palette-background);
+}
+
+#template-move-buttons {
+    width: 175px;
+    height: 175px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translate(-50%, -20px);
+}
+
+#template-move-buttons  div {
+    flex-grow: 1;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+#template-move-buttons > div:nth-child(2) {
+    justify-content: space-between;
+}
+
+#template-move-buttons button {
+    aspect-ratio: 1/1;
+    border: 0;
+    background: var(--bubble-background);
+    cursor: pointer;
+    border-radius: 20px;
+    pointer-events: auto;
 }
 
 /* Scrollbar, Firefox only */

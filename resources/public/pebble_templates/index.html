@@ -118,12 +118,51 @@
             </div>
             <div id="user-message" class="palette-overlay"></div>
             <div id="palette"></div>
+            <div id="template-move-buttons" style="display: none;">
+                <!-- Top row -->
+                <div>
+                    <button type="button" data-direction="up"><i class="fas fa-arrow-up"></i></button>
+                </div>
+                <!-- Middle row -->
+                <div>
+                    <button type="button" data-direction="left"><i class="fas fa-arrow-left"></i></button>
+                    <button type="button" data-action="close"><i class="fas fa-check"></i></button>
+                    <button type="button" data-direction="right"><i class="fas fa-arrow-right"></i></button>
+                </div>
+                <!-- Bottom row -->
+                <div>
+                    <button type="button" data-direction="down"><i class="fas fa-arrow-down"></i></button>
+                </div>
+            </div>
         </div>
     </div>
 </main>
 
 
 <div id="lookup" class="floating-panel"></div>
+<div id="lookup-template" class="floating-panel" style="display: none;">
+    <!-- $('<div>').css('display', 'flex').css('flex-direction', 'column').append(
+          $('<span>').text('Template:'),
+          $('<div>').css('display', 'flex').append(
+            $('<button>').addClass('text-button').text(__('Show Mover')).click(function() {
+              template.showTemplateMoveButtons();
+              self.elements.lookup.fadeOut(200);
+            }),
+            $('<button>').addClass('text-button').text(__('Move Here')).click(function() {
+              template.queueUpdate({
+                ox: data.x,
+                oy: data.y
+              });
+              template.showTemplateMoveButtons();
+            })
+          )
+        ) -->
+    <span>{{i18n('Localization', 'Template:') | raw}}</span>
+    <div style="display: flex">
+        <button class="text-button" id="show-mover">{{i18n('Localization', 'Show Mover') | raw}}</button>
+        <button class="text-button" id="move-here">{{i18n('Localization', 'Move Here') | raw}}</button>
+    </div>
+</div>
 <div id="loading"><span>{{i18n('Localization', 'Loading...') | raw}}</span></div>
 <div id="cursor">
     <div id="cursor-text"><i class="fas fa-spinner fa-spin captcha-loading-icon"></i> <span id="placeableCount-cursor">{{i18n('Localization', 'N/A') | raw}}</span></div>

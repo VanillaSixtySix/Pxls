@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Pxls\n"
-"POT-Creation-Date: 2023-03-31T00:00:15.391Z\n"
+"POT-Creation-Date: 2023-04-29T19:35:27.272Z\n"
 "Language: sv\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 
@@ -58,6 +58,18 @@ msgstr "Ångra"
 #: resources/public/pebble_templates/index.html
 msgid "You are not signed in.&nbsp;<a href=\"#\">Sign in with...</a>"
 msgstr "Du är inte inloggad. &nbsp;<a href=\"#\">Logga in med...</a>"
+
+#: resources/public/pebble_templates/index.html
+msgid "Template:"
+msgstr ""
+
+#: resources/public/pebble_templates/index.html
+msgid "Show Mover"
+msgstr ""
+
+#: resources/public/pebble_templates/index.html
+msgid "Move Here"
+msgstr ""
 
 #: resources/public/pebble_templates/index.html
 msgid "Loading..."
@@ -2085,10 +2097,6 @@ msgid "Hide sensitive information"
 msgstr "Göm sensitive information"
 
 #: resources/public/include/lookup.js
-msgid "Move Template Here"
-msgstr "Flytta Template"
-
-#: resources/public/include/lookup.js
 msgid "An error occurred, either you aren't logged in or you may be attempting to look up users too fast. Please try again in 60 seconds"
 msgstr "Ett fel uppstod, antingen är du inte inloggad eller så försöker du kolla upp användare för snabbt. Snälla försök igen om 60 sekunder"
 
@@ -2489,6 +2497,9 @@ msgstr "Mod Aktioner"
 #: resources/public/admin/admin.js
 msgid "More..."
 msgstr "Mer..."
+
+#~ msgid "Move Template Here"
+#~ msgstr "Flytta Template"
 
 #~ msgid "Replying to"
 #~ msgstr "Svarar"

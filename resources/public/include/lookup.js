@@ -11,7 +11,10 @@ module.exports.lookup = (function() {
   const self = {
     elements: {
       lookup: $('#lookup'),
-      prompt: $('#prompt')
+      prompt: $('#prompt'),
+      templateLookup: $('#lookup-template'),
+      showMover: $('#show-mover'),
+      moveHere: $('#move-here')
     },
     handle: null,
     report: function(id, x, y) {
@@ -41,6 +44,7 @@ module.exports.lookup = (function() {
           new SLIDEIN.Slidein(__('Sent report!'), 'info-circle').show().closeAfter(3000);
           modal.closeTop(true);
           self.elements.lookup.hide();
+          self.elements.templateLookup.hide();
         }).fail(function() {
           new SLIDEIN.Slidein(__('Error sending report.'), 'info-circle').show().closeAfter(3000);
         });
@@ -171,24 +175,38 @@ module.exports.lookup = (function() {
         return label;
       });
       self.elements.lookup.fadeIn(200);
+      if (template.getOptions().use) {
+        self.elements.showMover.click(function() {
+          template.showTemplateMoveButtons();
+          self.elements.lookup.fadeOut(200);
+          self.elements.templateLookup.fadeOut(200);
+        });
+        self.elements.moveHere.click(function() {
+          template.queueUpdate({
+            x: data.x,
+            y: data.y
+          });
+          self.elements.lookup.fadeOut(200);
+          self.elements.templateLookup.fadeOut(200);
+        });
+        self.elements.templateLookup.css('top', self.elements.lookup.height() + 100);
+        self.elements.templateLookup.fadeIn(200);
+      }
     },
     _makeShell: function(data) {
       return self.elements.lookup.empty().append(
         $('<div>').addClass('content'),
-        (!data.bg && user.isLoggedIn()
-          ? $('<button>').css('float', 'left').addClass('dangerous-button text-button').text(__('Report')).click(function() {
-            self.report(data.id, data.x, data.y);
+        $('<div>').addClass('buttons').append(
+          (!data.bg && user.isLoggedIn()
+            ? $('<button>').addClass('dangerous-button text-button').text(__('Report')).click(function() {
+              self.report(data.id, data.x, data.y);
+            })
+            : ''),
+          $('<button>').addClass('text-button').text(__('Close')).click(function() {
+            self.elements.templateLookup.fadeOut(200);
+            self.elements.lookup.fadeOut(200);
           })
-          : ''),
-        $('<button>').css('float', 'right').addClass('text-button').text(__('Close')).click(function() {
-          self.elements.lookup.fadeOut(200);
-        }),
-        (template.getOptions().use ? $('<button>').css('float', 'right').addClass('text-button').text(__('Move Template Here')).click(function() {
-          template.queueUpdate({
-            ox: data.x,
-            oy: data.y
-          });
-        }) : '')
+        )
       );
     },
     runLookup(clientX, clientY) {
@@ -206,6 +224,10 @@ module.exports.lookup = (function() {
       }).fail(function() {
         self._makeShell({ x: pos.x, y: pos.y }).find('.content').first().append($('<p>').css('color', '#c00').text(__("An error occurred, either you aren't logged in or you may be attempting to look up users too fast. Please try again in 60 seconds")));
         self.elements.lookup.fadeIn(200);
+        if (template.getOptions().use) {
+          self.elements.templateLookup.css('top', self.elements.lookup.height() + 16);
+          self.elements.templateLookup.fadeIn(200);
+        }
       });
     },
     webinit: function() {
@@ -296,6 +318,7 @@ module.exports.lookup = (function() {
       });
 
       self.elements.lookup.hide();
+      self.elements.templateLookup.hide();
       self.elements.prompt.hide();
       board.getRenderBoard().on('click', function(evt) {
         if (evt.shiftKey) {

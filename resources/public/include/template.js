@@ -24,7 +24,8 @@ module.exports.template = (function() {
       styleSelect: $('#template-style-mode'),
       styleOptionCustom: $('#template-style-mode-custom'),
       conversionModeSelect: $('#template-conversion-mode-select'),
-      opacityPercentage: $('#template-opacity-percentage')
+      opacityPercentage: $('#template-opacity-percentage'),
+      templateMoveButtons: $('#template-move-buttons')
     },
     gl: {
       context: null,
@@ -373,6 +374,63 @@ module.exports.template = (function() {
       self.elements.conversionModeSelect.on('change input', (e) => self._update({ convertMode: e.target.value }));
 
       self.updateSettings();
+
+      self.elements.templateMoveButtons.on('mousedown', '[data-direction]', function(evt) {
+        evt.preventDefault();
+        const direction = $(this).data('direction');
+        const amount = 1;
+        const initialUpdateRate = 300; // Initial update rate in milliseconds
+        let updateRate = initialUpdateRate;
+        const updateTime = 700; // Time in milliseconds after which the update rate will be reduced
+
+        const update = () => {
+          const newPosition = {};
+          switch (direction) {
+            case 'up':
+              newPosition.y = self.options.y - amount;
+              break;
+            case 'down':
+              newPosition.y = self.options.y + amount;
+              break;
+            case 'left':
+              newPosition.x = self.options.x - amount;
+              break;
+            case 'right':
+              newPosition.x = self.options.x + amount;
+              break;
+          }
+          self._update(newPosition, true);
+        };
+
+        let timer;
+        const timerStart = Date.now();
+
+        const updateLoop = () => {
+          update();
+
+          // Calculate the new update rate based on elapsed time
+          const elapsedTime = Date.now() - timerStart;
+          updateRate = Math.max(initialUpdateRate / Math.pow(2, elapsedTime / updateTime), 20);
+
+          timer = setTimeout(updateLoop, updateRate);
+        };
+
+        updateLoop();
+
+        // Cancel the updating loop on mouseup
+        $(this).on('mouseup mouseout', function() {
+          clearTimeout(timer);
+          $(this).off('mouseup mouseout');
+        });
+      });
+
+      self.elements.templateMoveButtons.on('click', '[data-action]', function(evt) {
+        evt.preventDefault();
+        const action = $(this).data('action');
+        if (action === 'close') {
+          self.hideTemplateMoveButtons();
+        }
+      });
 
       $(window).keydown(function(evt) {
         if (['INPUT', 'TEXTAREA'].includes(evt.target.nodeName)) {
@@ -863,6 +921,12 @@ module.exports.template = (function() {
       self.gl.context.bindTexture(self.gl.context.TEXTURE_2D, self.gl.textures.style);
 
       self.gl.context.drawArrays(self.gl.context.TRIANGLE_STRIP, 0, 4);
+    },
+    showTemplateMoveButtons: function() {
+      self.elements.templateMoveButtons.show();
+    },
+    hideTemplateMoveButtons: function() {
+      self.elements.templateMoveButtons.hide();
     }
   };
   return {
@@ -876,6 +940,8 @@ module.exports.template = (function() {
     setPixelated: self.setPixelated,
     getDisplayWidth: self.getDisplayWidth,
     getDisplayHeight: self.getDisplayHeight,
-    getWidthRatio: self.getWidthRatio
+    getWidthRatio: self.getWidthRatio,
+    showTemplateMoveButtons: self.showTemplateMoveButtons,
+    hideTemplateMoveButtons: self.hideTemplateMoveButtons
   };
 })();

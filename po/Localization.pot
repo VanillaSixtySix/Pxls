@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Pxls\n"
-"POT-Creation-Date: 2023-03-31T00:00:15.391Z\n"
+"POT-Creation-Date: 2023-04-29T19:35:27.272Z\n"
 "Language: \n"
 "Content-Type: text/plain; charset=UTF-8\n"
 
@@ -57,6 +57,18 @@ msgstr ""
 
 #: resources/public/pebble_templates/index.html
 msgid "You are not signed in.&nbsp;<a href=\"#\">Sign in with...</a>"
+msgstr ""
+
+#: resources/public/pebble_templates/index.html
+msgid "Template:"
+msgstr ""
+
+#: resources/public/pebble_templates/index.html
+msgid "Show Mover"
+msgstr ""
+
+#: resources/public/pebble_templates/index.html
+msgid "Move Here"
 msgstr ""
 
 #: resources/public/pebble_templates/index.html
@@ -2086,10 +2098,6 @@ msgstr ""
 
 #: resources/public/include/lookup.js
 msgid "Hide sensitive information"
-msgstr ""
-
-#: resources/public/include/lookup.js
-msgid "Move Template Here"
 msgstr ""
 
 #: resources/public/include/lookup.js
